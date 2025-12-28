@@ -4,7 +4,6 @@ import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
 import { HeroSection } from '@/components/HeroSection';
 import { ContentSection } from '@/components/ContentSection';
-import { sections } from '@/data/typescript-content';
 
 function TypeScriptLearningApp() {
   const [showHero, setShowHero] = useState(true);

@@ -1,5 +1,5 @@
 import { learningPaths, stats } from '@/data/typescript-content';
-import { Zap, Calendar, Award, ArrowRight } from 'lucide-react';
+import { Zap, Calendar, Award, ArrowRight, Play, FileQuestion, TrendingUp, FileText } from 'lucide-react';
 
 const pathIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   Zap,
@@ -9,9 +9,11 @@ const pathIcons: Record<string, React.ComponentType<{ className?: string }>> = {
 
 interface HeroSectionProps {
   onStartLearning: () => void;
+  onOpenProgress: () => void;
+  onOpenCheatSheets: () => void;
 }
 
-export function HeroSection({ onStartLearning }: HeroSectionProps) {
+export function HeroSection({ onStartLearning, onOpenProgress, onOpenCheatSheets }: HeroSectionProps) {
   return (
     <div className="mb-12">
       {/* Hero */}
@@ -30,13 +32,53 @@ export function HeroSection({ onStartLearning }: HeroSectionProps) {
           A comprehensive, professional-grade learning system with 6,000+ lines of content, 
           200+ code examples, and hands-on projects.
         </p>
-        <button
-          onClick={onStartLearning}
-          className="mt-6 inline-flex items-center gap-2 bg-primary px-6 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          Start Learning
-          <ArrowRight className="h-4 w-4" />
-        </button>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={onStartLearning}
+            className="inline-flex items-center gap-2 bg-primary px-6 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Start Learning
+            <ArrowRight className="h-4 w-4" />
+          </button>
+          <button
+            onClick={onOpenProgress}
+            className="inline-flex items-center gap-2 border border-border bg-card px-6 py-3 font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            <TrendingUp className="h-4 w-4" />
+            View Progress
+          </button>
+          <button
+            onClick={onOpenCheatSheets}
+            className="inline-flex items-center gap-2 border border-border bg-card px-6 py-3 font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            <FileText className="h-4 w-4" />
+            Cheat Sheets
+          </button>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div className="mb-12 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="border border-border bg-card p-4 text-center">
+          <Play className="mx-auto mb-2 h-6 w-6 text-primary" />
+          <div className="text-sm font-medium text-foreground">Code Playground</div>
+          <div className="text-xs text-muted-foreground">Run code in-browser</div>
+        </div>
+        <div className="border border-border bg-card p-4 text-center">
+          <FileQuestion className="mx-auto mb-2 h-6 w-6 text-primary" />
+          <div className="text-sm font-medium text-foreground">Interactive Quizzes</div>
+          <div className="text-xs text-muted-foreground">Test your knowledge</div>
+        </div>
+        <div className="border border-border bg-card p-4 text-center">
+          <TrendingUp className="mx-auto mb-2 h-6 w-6 text-primary" />
+          <div className="text-sm font-medium text-foreground">Progress Tracking</div>
+          <div className="text-xs text-muted-foreground">Track completion</div>
+        </div>
+        <div className="border border-border bg-card p-4 text-center">
+          <FileText className="mx-auto mb-2 h-6 w-6 text-primary" />
+          <div className="text-sm font-medium text-foreground">PDF Cheat Sheets</div>
+          <div className="text-xs text-muted-foreground">Quick reference</div>
+        </div>
       </div>
 
       {/* Stats */}

@@ -20,9 +20,10 @@ interface SidebarProps {
   activeSection: string;
   activeSubsection: string;
   onNavigate: (sectionId: string, subsectionId: string) => void;
+  onGoHome: () => void;
 }
 
-export function Sidebar({ activeSection, activeSubsection, onNavigate }: SidebarProps) {
+export function Sidebar({ activeSection, activeSubsection, onNavigate, onGoHome }: SidebarProps) {
   const [expandedSections, setExpandedSections] = useState<string[]>([activeSection]);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -125,14 +126,17 @@ export function Sidebar({ activeSection, activeSubsection, onNavigate }: Sidebar
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex h-16 items-center justify-center border-b border-border px-4">
+        <button 
+          onClick={onGoHome}
+          className="flex h-16 w-full items-center justify-center border-b border-border px-4 hover:bg-muted/50 transition-colors"
+        >
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center bg-primary text-primary-foreground">
               <Code className="h-4 w-4" />
             </div>
             <span className="font-semibold text-foreground">TypeScript Hub</span>
           </div>
-        </div>
+        </button>
         <SidebarContent />
       </aside>
     </>

@@ -1,5 +1,8 @@
 import { sections, Subsection } from '@/data/typescript-content';
+import { getQuizForSection } from '@/data/quiz-data';
 import { CodeBlock } from './CodeBlock';
+import { CodePlayground } from './CodePlayground';
+import { Quiz } from './Quiz';
 import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -167,6 +170,29 @@ export function ContentSection({ sectionId, subsectionId, onNavigate }: ContentS
               description={example.description}
             />
           ))}
+        </div>
+      )}
+
+      {/* Code Playground */}
+      <div className="mt-8">
+        <CodePlayground 
+          title="Try it yourself"
+          initialCode={subsection.codeExamples?.[0]?.code || '// Write your TypeScript code here\nlet message: string = "Hello!";\nconsole.log(message);'}
+        />
+      </div>
+
+      {/* Quiz Section */}
+      {getQuizForSection(sectionId, subsectionId) && (
+        <div className="mt-8">
+          <Quiz 
+            title={`Quiz: ${subsection.title}`}
+            questions={getQuizForSection(sectionId, subsectionId)!}
+            onComplete={(score) => {
+              const scores = JSON.parse(localStorage.getItem('quizScores') || '{}');
+              scores[subsection.title] = score;
+              localStorage.setItem('quizScores', JSON.stringify(scores));
+            }}
+          />
         </div>
       )}
 

@@ -122,8 +122,8 @@ export function Sidebar({ activeSection, activeSubsection, onNavigate, onGoHome 
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 z-40 h-full w-72 transform border-r border-border bg-card transition-transform lg:static lg:translate-x-0 ${
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`w-72 border-r border-border bg-card lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 ${
+          isMobileOpen ? 'fixed inset-y-0 left-0 z-40 translate-x-0' : 'fixed -translate-x-full lg:translate-x-0'
         }`}
       >
         <button 

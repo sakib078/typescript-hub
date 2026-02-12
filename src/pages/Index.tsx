@@ -42,19 +42,20 @@ function TypeScriptLearningApp() {
 
   return (
     <div className="flex min-h-screen w-full bg-background">
-      <Sidebar
-        activeSection={activeSection}
-        activeSubsection={activeSubsection}
-        onNavigate={handleNavigate}
-        onGoHome={handleGoHome}
-      />
-      
-      <div className="flex flex-1 flex-col">
+   
+        <Sidebar
+          activeSection={activeSection}
+          activeSubsection={activeSubsection}
+          onNavigate={handleNavigate}
+          onGoHome={handleGoHome}
+        />
+
+      <div className="flex flex-1 flex-col lg:pl-72">
         <Header onSearch={handleNavigate} />
-        
+
         <main className="flex-1 px-4 py-8 lg:px-8">
           {viewMode === 'hero' && (
-            <HeroSection 
+            <HeroSection
               onStartLearning={handleStartLearning}
               onOpenProgress={() => setViewMode('progress')}
               onOpenCheatSheets={() => setViewMode('cheatsheets')}

@@ -14,4 +14,4 @@ User-agent: *
 Allow: /
 
 # Link to your Sitemap
-Sitemap: https://yourdomain.com/sitemap.xml
+Sitemap: https://sakib078.github.io/typescript-hub/sitemap.xml

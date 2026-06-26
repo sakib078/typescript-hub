@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+# GITHUB_TOKEN needs write access to push the built site to the gh-pages branch.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,5 +22,5 @@ jobs:
 
       - uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.TYPESCRIPT_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { sections } from '@/data/typescript-content';
+import { learnPath } from '@/lib/seo';
 
 interface SearchResult {
   sectionId: string;
@@ -10,11 +12,8 @@ interface SearchResult {
   snippet: string;
 }
 
-interface SearchSliderProps {
-  onNavigate: (sectionId: string, subsectionId: string) => void;
-}
-
-export function SearchSlider({ onNavigate }: SearchSliderProps) {
+export function SearchSlider() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -78,7 +77,7 @@ export function SearchSlider({ onNavigate }: SearchSliderProps) {
   }, [query]);
 
   const handleResultClick = (result: SearchResult) => {
-    onNavigate(result.sectionId, result.subsectionId);
+    navigate(learnPath(result.sectionId, result.subsectionId));
     setIsOpen(false);
     setQuery('');
   };

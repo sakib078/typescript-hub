@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { ChevronDown, BookOpen, Settings, Code, Zap, Box, Layers, Sparkles, Wrench, Filter, Cloud, Menu, X } from 'lucide-react';
-import { sections, Section } from '@/data/typescript-content';
+import { sections } from '@/data/typescript-content';
+import { learnPath } from '@/lib/seo';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   BookOpen,
@@ -16,15 +18,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Atom: Sparkles,
 };
 
-interface SidebarProps {
-  activeSection: string;
-  activeSubsection: string;
-  onNavigate: (sectionId: string, subsectionId: string) => void;
-  onGoHome: () => void;
-}
-
-export function Sidebar({ activeSection, activeSubsection, onNavigate, onGoHome }: SidebarProps) {
-  const [expandedSections, setExpandedSections] = useState<string[]>([activeSection]);
+export function Sidebar() {
+  const { sectionId: activeSection, subsectionId: activeSubsection } = useParams();
+  const [expandedSections, setExpandedSections] = useState<string[]>(
+    activeSection ? [activeSection] : ['introduction']
+  );
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const toggleSection = (sectionId: string) => {
@@ -33,14 +31,6 @@ export function Sidebar({ activeSection, activeSubsection, onNavigate, onGoHome 
         ? prev.filter(id => id !== sectionId)
         : [...prev, sectionId]
     );
-  };
-
-  const handleNavigate = (sectionId: string, subsectionId: string) => {
-    onNavigate(sectionId, subsectionId);
-    if (!expandedSections.includes(sectionId)) {
-      setExpandedSections(prev => [...prev, sectionId]);
-    }
-    setIsMobileOpen(false);
   };
 
   const SidebarContent = () => (
@@ -80,16 +70,17 @@ export function Sidebar({ activeSection, activeSubsection, onNavigate, onGoHome 
                 <ul className="ml-4 mt-1 space-y-1 border-l border-border pl-4">
                   {section.subsections.map((sub) => (
                     <li key={sub.id}>
-                      <button
-                        onClick={() => handleNavigate(section.id, sub.id)}
-                        className={`w-full px-3 py-1.5 text-left text-sm transition-colors ${
+                      <Link
+                        to={learnPath(section.id, sub.id)}
+                        onClick={() => setIsMobileOpen(false)}
+                        className={`block w-full px-3 py-1.5 text-left text-sm transition-colors ${
                           activeSubsection === sub.id
                             ? 'text-primary'
                             : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         {sub.title}
-                      </button>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -126,8 +117,9 @@ export function Sidebar({ activeSection, activeSubsection, onNavigate, onGoHome 
           isMobileOpen ? 'fixed inset-y-0 left-0 z-40 translate-x-0' : 'fixed -translate-x-full lg:translate-x-0'
         }`}
       >
-        <button 
-          onClick={onGoHome}
+        <Link
+          to="/"
+          onClick={() => setIsMobileOpen(false)}
           className="flex h-16 w-full items-center justify-center border-b border-border px-4 hover:bg-muted/50 transition-colors"
         >
           <div className="flex items-center gap-2">
@@ -136,7 +128,7 @@ export function Sidebar({ activeSection, activeSubsection, onNavigate, onGoHome 
             </div>
             <span className="font-semibold text-foreground">TypeScript Hub</span>
           </div>
-        </button>
+        </Link>
         <SidebarContent />
       </aside>
     </>

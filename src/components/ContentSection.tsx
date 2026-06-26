@@ -1,29 +1,37 @@
-import { sections, Subsection } from '@/data/typescript-content';
+import { sections } from '@/data/typescript-content';
 import { getQuizForSection } from '@/data/quiz-data';
+import { learnPath } from '@/lib/seo';
 import { CodeBlock } from './CodeBlock';
 import { CodePlayground } from './CodePlayground';
 import { Quiz } from './Quiz';
 import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ClientOnly } from 'vite-react-ssg';
 import { useState, useEffect } from 'react';
 
 interface ContentSectionProps {
   sectionId: string;
   subsectionId: string;
-  onNavigate: (sectionId: string, subsectionId: string) => void;
 }
 
-export function ContentSection({ sectionId, subsectionId, onNavigate }: ContentSectionProps) {
-  const [completedSections, setCompletedSections] = useState<string[]>(() => {
-    const stored = localStorage.getItem('completedSections');
-    return stored ? JSON.parse(stored) : [];
-  });
+export function ContentSection({ sectionId, subsectionId }: ContentSectionProps) {
+  const [completedSections, setCompletedSections] = useState<string[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
   const section = sections.find(s => s.id === sectionId);
   const subsection = section?.subsections.find(s => s.id === subsectionId);
 
+  // Hydrate completion state from localStorage on the client only (SSG renders in Node).
   useEffect(() => {
+    const stored = localStorage.getItem('completedSections');
+    if (stored) setCompletedSections(JSON.parse(stored));
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     localStorage.setItem('completedSections', JSON.stringify(completedSections));
-  }, [completedSections]);
+  }, [completedSections, hydrated]);
 
   if (!section || !subsection) {
     return (
@@ -173,13 +181,28 @@ export function ContentSection({ sectionId, subsectionId, onNavigate }: ContentS
         </div>
       )}
 
-      {/* Code Playground */}
-      <div className="mt-8">
-        <CodePlayground 
-          title="Try it yourself"
-          initialCode={subsection.codeExamples?.[0]?.code || '// Write your TypeScript code here\nlet message: string = "Hello!";\nconsole.log(message);'}
-        />
-      </div>
+      {/* Code Playground — only when the topic defines a dedicated runnable example.
+          Rendered client-only: it's an interactive widget with no SEO value, and the
+          underlying editor isn't server-renderable. */}
+      {subsection.playground && (
+        <div className="mt-8">
+          <ClientOnly
+            fallback={
+              <div className="flex min-h-[240px] items-center justify-center rounded-lg border border-border bg-card text-sm text-muted-foreground">
+                Loading interactive playground…
+              </div>
+            }
+          >
+            {() => (
+              <CodePlayground
+                title="Try it yourself"
+                initialCode={subsection.playground!.code}
+                hint={subsection.playground!.hint}
+              />
+            )}
+          </ClientOnly>
+        </div>
+      )}
 
       {/* Quiz Section */}
       {getQuizForSection(sectionId, subsectionId) && (
@@ -199,8 +222,8 @@ export function ContentSection({ sectionId, subsectionId, onNavigate }: ContentS
       {/* Navigation */}
       <div className="mt-12 flex items-center justify-between border-t border-border pt-8">
         {prev ? (
-          <button
-            onClick={() => onNavigate(prev.sectionId, prev.subsectionId)}
+          <Link
+            to={learnPath(prev.sectionId, prev.subsectionId)}
             className="group flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
           >
             <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -208,14 +231,14 @@ export function ContentSection({ sectionId, subsectionId, onNavigate }: ContentS
               <div className="text-xs uppercase tracking-wide">Previous</div>
               <div className="text-sm font-medium text-foreground">{prev.title}</div>
             </div>
-          </button>
+          </Link>
         ) : (
           <div />
         )}
 
         {next ? (
-          <button
-            onClick={() => onNavigate(next.sectionId, next.subsectionId)}
+          <Link
+            to={learnPath(next.sectionId, next.subsectionId)}
             className="group flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
           >
             <div className="text-right">
@@ -223,7 +246,7 @@ export function ContentSection({ sectionId, subsectionId, onNavigate }: ContentS
               <div className="text-sm font-medium text-foreground">{next.title}</div>
             </div>
             <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </button>
+          </Link>
         ) : (
           <div />
         )}

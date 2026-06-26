@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, CheckCircle2, Clock, Trophy, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { BookOpen, CheckCircle2, Trophy, TrendingUp } from 'lucide-react';
 import { sections } from '@/data/typescript-content';
+import { learnPath } from '@/lib/seo';
 
-interface ProgressDashboardProps {
-  onNavigate: (sectionId: string, subsectionId: string) => void;
-}
-
-export function ProgressDashboard({ onNavigate }: ProgressDashboardProps) {
+export function ProgressDashboard() {
   const [completedSections, setCompletedSections] = useState<string[]>([]);
   const [quizScores, setQuizScores] = useState<Record<string, number>>({});
 
@@ -119,12 +117,12 @@ export function ProgressDashboard({ onNavigate }: ProgressDashboardProps) {
               <p className="text-xs text-muted-foreground mb-2">Continue Learning</p>
               <p className="font-medium text-foreground mb-1">{nextSubsection.title}</p>
               <p className="text-sm text-muted-foreground mb-3">{nextSection.title}</p>
-              <button
-                onClick={() => onNavigate(nextSection.id, nextSubsection.id)}
-                className="w-full px-4 py-2 bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+              <Link
+                to={learnPath(nextSection.id, nextSubsection.id)}
+                className="block w-full px-4 py-2 bg-primary text-primary-foreground text-sm font-medium text-center hover:bg-primary/90 transition-colors"
               >
                 Continue
-              </button>
+              </Link>
             </div>
           )}
         </div>

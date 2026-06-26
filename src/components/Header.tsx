@@ -2,11 +2,7 @@ import { Moon, Sun, Github } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { SearchSlider } from './SearchSlider';
 
-interface HeaderProps {
-  onSearch: (sectionId: string, subsectionId: string) => void;
-}
-
-export function Header({ onSearch }: HeaderProps) {
+export function Header() {
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -23,7 +19,7 @@ export function Header({ onSearch }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <SearchSlider onNavigate={onSearch} />
+        <SearchSlider />
         
         <a
           href="https://github.com/microsoft/TypeScript"

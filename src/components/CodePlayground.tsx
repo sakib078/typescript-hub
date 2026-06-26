@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Editor from 'react-simple-code-editor';
 import { Play, RotateCcw, Copy, Check } from 'lucide-react';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-typescript';
@@ -6,53 +7,68 @@ import 'prismjs/components/prism-typescript';
 interface CodePlaygroundProps {
   initialCode?: string;
   title?: string;
+  hint?: string;
 }
 
-export function CodePlayground({ 
-  initialCode = `// Try TypeScript here!\nlet message: string = "Hello, TypeScript!";\nconsole.log(message);\n\n// Try adding a type error:\n// message = 123;`,
-  title = "TypeScript Playground"
+export function CodePlayground({
+  initialCode = `// Try TypeScript here!\nlet message: string = "Hello, TypeScript!";\nconsole.log(message);`,
+  title = 'TypeScript Playground',
+  hint,
 }: CodePlaygroundProps) {
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [running, setRunning] = useState(false);
 
-  const runCode = () => {
+  const runCode = async () => {
+    setRunning(true);
     setOutput([]);
     setError(null);
-    
+
     const logs: string[] = [];
-    const originalLog = console.log;
-    const originalError = console.error;
-    
-    // Override console methods
-    console.log = (...args) => {
-      logs.push(args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ).join(' '));
-    };
-    console.error = (...args) => {
-      logs.push(`Error: ${args.join(' ')}`);
+    const format = (args: unknown[]) =>
+      args
+        .map((arg) =>
+          typeof arg === 'object' && arg !== null ? JSON.stringify(arg, null, 2) : String(arg),
+        )
+        .join(' ');
+
+    const sandboxConsole = {
+      log: (...args: unknown[]) => logs.push(format(args)),
+      info: (...args: unknown[]) => logs.push(format(args)),
+      warn: (...args: unknown[]) => logs.push(format(args)),
+      error: (...args: unknown[]) => logs.push(`Error: ${format(args)}`),
     };
 
     try {
-      // Simple TypeScript to JavaScript conversion (strips type annotations)
-      const jsCode = code
-        .replace(/:\s*\w+(\[\])?(\s*[=,);])/g, '$2') // Remove type annotations
-        .replace(/:\s*\w+(\[\])?\s*$/gm, '') // Remove trailing type annotations
-        .replace(/<\w+>/g, '') // Remove generic types
-        .replace(/interface\s+\w+\s*\{[^}]*\}/g, '') // Remove interfaces
-        .replace(/type\s+\w+\s*=\s*[^;]+;/g, '') // Remove type aliases
-        .replace(/as\s+\w+/g, ''); // Remove type assertions
-      
-      // eslint-disable-next-line no-new-func
-      new Function(jsCode)();
+      // Lazy-load the real TypeScript compiler only when the user runs code,
+      // so it ships as a separate on-demand chunk (not in the initial bundle).
+      const ts = await import('typescript');
+      const { outputText, diagnostics } = ts.transpileModule(code, {
+        compilerOptions: {
+          target: ts.ScriptTarget.ES2020,
+          module: ts.ModuleKind.ESNext,
+        },
+        reportDiagnostics: true,
+      });
+
+      if (diagnostics && diagnostics.length > 0) {
+        const messages = diagnostics.map((d) =>
+          ts.flattenDiagnosticMessageText(d.messageText, '\n'),
+        );
+        setError(messages.join('\n'));
+        return;
+      }
+
+      // Run the transpiled JS in a sandbox with a captured console.
+      const fn = new Function('console', outputText);
+      fn(sandboxConsole);
       setOutput(logs.length > 0 ? logs : ['Code executed successfully (no output)']);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? `${err.name}: ${err.message}` : 'An error occurred');
     } finally {
-      console.log = originalLog;
-      console.error = originalError;
+      setRunning(false);
     }
   };
 
@@ -68,65 +84,67 @@ export function CodePlayground({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const highlightedCode = Prism.highlight(code, Prism.languages.typescript, 'typescript');
-
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-2">
         <span className="text-sm font-medium text-foreground">{title}</span>
         <div className="flex items-center gap-2">
           <button
             onClick={copyCode}
-            className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
             {copied ? 'Copied' : 'Copy'}
           </button>
           <button
             onClick={resetCode}
-            className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             <RotateCcw className="h-3 w-3" />
             Reset
           </button>
           <button
             onClick={runCode}
-            className="flex items-center gap-1 bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            disabled={running}
+            className="flex items-center gap-1 bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
           >
             <Play className="h-3 w-3" />
-            Run
+            {running ? 'Running…' : 'Run'}
           </button>
         </div>
       </div>
 
-      {/* Editor */}
-      <div className="relative">
-        <textarea
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-foreground font-mono text-sm p-4 resize-none focus:outline-none z-10"
-          spellCheck={false}
-          style={{ minHeight: '200px' }}
-        />
-        <pre className="p-4 font-mono text-sm overflow-x-auto pointer-events-none" style={{ minHeight: '200px' }}>
-          <code 
-            className="language-typescript"
-            dangerouslySetInnerHTML={{ __html: highlightedCode }}
-          />
-        </pre>
-      </div>
+      {hint && (
+        <div className="border-b border-border bg-muted/20 px-4 py-2 text-xs text-muted-foreground">
+          {hint}
+        </div>
+      )}
+
+      {/* Editor — react-simple-code-editor keeps the caret aligned with the
+          syntax-highlighted layer (textarea + highlight share identical metrics). */}
+      <Editor
+        value={code}
+        onValueChange={setCode}
+        highlight={(input) => Prism.highlight(input, Prism.languages.typescript, 'typescript')}
+        padding={16}
+        textareaClassName="focus:outline-none"
+        className="language-typescript min-h-[200px] font-mono text-sm"
+        style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 14, lineHeight: 1.6 }}
+      />
 
       {/* Output */}
       {(output.length > 0 || error) && (
         <div className="border-t border-border bg-muted/30 p-4">
-          <div className="text-xs font-medium text-muted-foreground mb-2">Output:</div>
-          <div className="font-mono text-sm space-y-1">
+          <div className="mb-2 text-xs font-medium text-muted-foreground">Output:</div>
+          <div className="space-y-1 font-mono text-sm">
             {error ? (
-              <div className="text-destructive">{error}</div>
+              <pre className="whitespace-pre-wrap text-destructive">{error}</pre>
             ) : (
               output.map((line, idx) => (
-                <div key={idx} className="text-foreground">{line}</div>
+                <pre key={idx} className="whitespace-pre-wrap text-foreground">
+                  {line}
+                </pre>
               ))
             )}
           </div>

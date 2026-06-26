@@ -141,6 +141,151 @@ export const quizzes: Record<string, QuizQuestion[]> = {
       explanation: 'Generic type parameters (like T) are used consistently throughout the function signature.',
       codeTemplate: 'function identity<__>(value: __): __ {\n  return value;\n}'
     }
+  ],
+  'types-any-unknown': [
+    {
+      id: '1',
+      type: 'multiple-choice',
+      question: 'Which type should you prefer for a value of uncertain type?',
+      options: ['any', 'unknown', 'never', 'object'],
+      correctAnswer: 1,
+      explanation: '`unknown` is the safe choice — it accepts any value but forces you to narrow before using it. `any` disables type checking entirely.'
+    },
+    {
+      id: '2',
+      type: 'multiple-choice',
+      question: 'What is special about the `never` type?',
+      options: [
+        'It accepts any value',
+        'It has no values at all',
+        'It is the same as void',
+        'It only accepts null'
+      ],
+      correctAnswer: 1,
+      explanation: '`never` is the empty type — it represents code that can never produce a value, like a function that always throws. It powers exhaustiveness checks.'
+    }
+  ],
+  'types-tuples-enums': [
+    {
+      id: '1',
+      type: 'multiple-choice',
+      question: 'Why are string enums often preferred over numeric enums?',
+      options: [
+        'They run faster',
+        'Their runtime values are self-describing',
+        'They use less memory',
+        'They cannot be misused'
+      ],
+      correctAnswer: 1,
+      explanation: 'String enums produce readable runtime values (e.g. "ACTIVE"), which makes logs and debugging far clearer than bare numbers.'
+    },
+    {
+      id: '2',
+      type: 'code-completion',
+      question: 'Complete to derive a union from a const array: type S = typeof STATUS[___]',
+      correctAnswer: 'number',
+      explanation: 'Indexing a readonly array type with `[number]` yields the union of its element types — a lightweight alternative to enums.',
+      codeTemplate: 'const STATUS = ["a", "b"] as const;\ntype S = typeof STATUS[___];'
+    }
+  ],
+  'generics-generic-constraints': [
+    {
+      id: '1',
+      type: 'multiple-choice',
+      question: 'What does `<T extends { length: number }>` mean?',
+      options: [
+        'T must be a number',
+        'T must have a length property',
+        'T must be an array',
+        'T extends a class named length'
+      ],
+      correctAnswer: 1,
+      explanation: 'The constraint requires T to be any type that has a numeric `length` property — strings and arrays qualify, plain numbers do not.'
+    },
+    {
+      id: '2',
+      type: 'code-completion',
+      question: 'Constrain K to the keys of T: function get<T, K ______ keyof T>(o: T, k: K)',
+      correctAnswer: 'extends',
+      explanation: 'Use `extends keyof T` to constrain K to be one of T’s property names, enabling type-safe property access.',
+      codeTemplate: 'function get<T, K ______ keyof T>(o: T, k: K) {\n  return o[k];\n}'
+    }
+  ],
+  'advanced-keyof-typeof': [
+    {
+      id: '1',
+      type: 'multiple-choice',
+      question: 'What does `keyof` produce for `type User = { id: number; name: string }`?',
+      options: [
+        'number | string',
+        '"id" | "name"',
+        'User[]',
+        '{ id: string; name: string }'
+      ],
+      correctAnswer: 1,
+      explanation: '`keyof User` is the union of the object’s property names: "id" | "name".'
+    },
+    {
+      id: '2',
+      type: 'code-completion',
+      question: 'Get a type from a value: type T = ______ myConfig',
+      correctAnswer: 'typeof',
+      explanation: 'In a type position, `typeof value` gives the type TypeScript inferred for that value — handy for deriving a type from existing data.',
+      codeTemplate: 'const myConfig = { debug: true };\ntype T = ______ myConfig;'
+    }
+  ],
+  'utility-types-partial-required': [
+    {
+      id: '1',
+      type: 'multiple-choice',
+      question: 'What does `Partial<T>` do?',
+      options: [
+        'Removes all properties',
+        'Makes all properties optional',
+        'Makes all properties readonly',
+        'Picks half the properties'
+      ],
+      correctAnswer: 1,
+      explanation: '`Partial<T>` makes every property of T optional — ideal for update/patch payloads where only some fields are present.'
+    }
+  ],
+  'modern-typescript-satisfies': [
+    {
+      id: '1',
+      type: 'multiple-choice',
+      question: 'Why use `satisfies` instead of a type annotation?',
+      options: [
+        'It runs validation at runtime',
+        'It checks the value but keeps its precise inferred type',
+        'It is faster to compile',
+        'It converts the value to the target type'
+      ],
+      correctAnswer: 1,
+      explanation: '`satisfies` validates the value against a type while preserving the narrow, literal inferred type — so you keep exact keys and values.'
+    }
+  ],
+  'narrowing-type-predicates': [
+    {
+      id: '1',
+      type: 'multiple-choice',
+      question: 'What return type makes a function a custom type guard?',
+      options: [
+        'boolean',
+        'value is T',
+        'asserts value',
+        'T | undefined'
+      ],
+      correctAnswer: 1,
+      explanation: 'A return type of `value is T` (a type predicate) tells TypeScript to narrow the argument to T wherever the guard returns true.'
+    },
+    {
+      id: '2',
+      type: 'code-completion',
+      question: 'Complete the assertion function: function assert(x: unknown): ______ x is string {}',
+      correctAnswer: 'asserts',
+      explanation: 'An assertion function uses `asserts x is string` and throws if the condition fails; afterward TypeScript treats x as string.',
+      codeTemplate: 'function assert(x: unknown): ______ x is string {\n  if (typeof x !== "string") throw new Error();\n}'
+    }
   ]
 };
 

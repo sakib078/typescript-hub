@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { learningPaths, stats } from '@/data/typescript-content';
 import { Zap, Calendar, Award, ArrowRight, Play, FileQuestion, TrendingUp, FileText } from 'lucide-react';
 
@@ -7,13 +8,7 @@ const pathIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   Award
 };
 
-interface HeroSectionProps {
-  onStartLearning: () => void;
-  onOpenProgress: () => void;
-  onOpenCheatSheets: () => void;
-}
-
-export function HeroSection({ onStartLearning, onOpenProgress, onOpenCheatSheets }: HeroSectionProps) {
+export function HeroSection() {
   return (
     <div className="mb-12">
       {/* Hero */}
@@ -29,31 +24,32 @@ export function HeroSection({ onStartLearning, onOpenProgress, onOpenCheatSheets
           Master TypeScript
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          A comprehensive, professional-grade learning system with 6,000+ lines of content, 
-          200+ code examples, and hands-on projects.
+          A free, hands-on TypeScript course — from your first type to generics,
+          utility types, and modern TS 6 / 7 features. Read, run code in the browser,
+          and test yourself with quizzes.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <button
-            onClick={onStartLearning}
+          <Link
+            to="/learn/introduction/what-is-typescript"
             className="inline-flex items-center gap-2 bg-primary px-6 py-3 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Start Learning
             <ArrowRight className="h-4 w-4" />
-          </button>
-          <button
-            onClick={onOpenProgress}
+          </Link>
+          <Link
+            to="/progress"
             className="inline-flex items-center gap-2 border border-border bg-card px-6 py-3 font-medium text-foreground transition-colors hover:bg-muted"
           >
             <TrendingUp className="h-4 w-4" />
             View Progress
-          </button>
-          <button
-            onClick={onOpenCheatSheets}
+          </Link>
+          <Link
+            to="/cheatsheets"
             className="inline-flex items-center gap-2 border border-border bg-card px-6 py-3 font-medium text-foreground transition-colors hover:bg-muted"
           >
             <FileText className="h-4 w-4" />
             Cheat Sheets
-          </button>
+          </Link>
         </div>
       </div>
 

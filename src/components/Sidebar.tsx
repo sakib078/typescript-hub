@@ -34,7 +34,7 @@ export function Sidebar() {
   };
 
   const SidebarContent = () => (
-    <nav className="h-full overflow-y-auto py-4">
+    <nav className="min-h-0 flex-1 overflow-y-auto py-4 pb-16">
       <div className="mb-6 px-4">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Learning Path
@@ -113,7 +113,7 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`w-72 border-r border-border bg-card lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 ${
+        className={`flex w-72 flex-col border-r border-border bg-card lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 ${
           isMobileOpen ? 'fixed inset-y-0 left-0 z-40 translate-x-0' : 'fixed -translate-x-full lg:translate-x-0'
         }`}
       >

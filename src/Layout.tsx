@@ -21,7 +21,7 @@ export default function Layout() {
             <Sidebar />
             <div className="flex flex-1 flex-col lg:pl-72">
               <Header />
-              <main className="flex-1 px-4 py-8 lg:px-8">
+              <main className="flex-1 px-4 py-8 pb-20 lg:px-8">
                 <Outlet />
               </main>
               <footer className="border-t border-border px-4 py-6 text-center lg:px-8">

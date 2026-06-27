@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ChevronDown, BookOpen, Settings, Code, Zap, Box, Layers, Sparkles, Wrench, Filter, Cloud, Menu, X } from 'lucide-react';
 import { sections } from '@/data/typescript-content';
 import { learnPath } from '@/lib/seo';
+import { TypeScriptLogo } from './TypeScriptLogo';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   BookOpen,
@@ -123,9 +124,7 @@ export function Sidebar() {
           className="flex h-16 w-full items-center justify-center border-b border-border px-4 hover:bg-muted/50 transition-colors"
         >
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center bg-primary text-primary-foreground">
-              <Code className="h-4 w-4" />
-            </div>
+            <TypeScriptLogo className="h-8 w-8" />
             <span className="font-semibold text-foreground">TypeScript Hub</span>
           </div>
         </Link>

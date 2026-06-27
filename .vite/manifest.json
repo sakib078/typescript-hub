@@ -1,14 +1,14 @@
 {
-  "_client-M8i8NqpH.js": {
-    "file": "assets/client-M8i8NqpH.js",
+  "_client-B_2ZCQn_.js": {
+    "file": "assets/client-B_2ZCQn_.js",
     "name": "client",
     "isDynamicEntry": true,
     "imports": [
       "index.html"
     ]
   },
-  "_typescript-DCl0z4Ip.js": {
-    "file": "assets/typescript-DCl0z4Ip.js",
+  "_typescript-DOj1pknI.js": {
+    "file": "assets/typescript-DOj1pknI.js",
     "name": "typescript",
     "isDynamicEntry": true,
     "imports": [
@@ -16,14 +16,14 @@
     ]
   },
   "index.html": {
-    "file": "assets/app-Cw-yxjqY.js",
+    "file": "assets/app-NT21EfuF.js",
     "name": "app",
     "src": "index.html",
     "isEntry": true,
     "dynamicImports": [
-      "_client-M8i8NqpH.js",
-      "_client-M8i8NqpH.js",
-      "_typescript-DCl0z4Ip.js",
+      "_client-B_2ZCQn_.js",
+      "_client-B_2ZCQn_.js",
+      "_typescript-DOj1pknI.js",
       "node_modules/html2canvas/dist/html2canvas.esm.js",
       "node_modules/dompurify/dist/purify.es.mjs",
       "node_modules/canvg/lib/index.es.js"
@@ -33,7 +33,7 @@
     ]
   },
   "node_modules/canvg/lib/index.es.js": {
-    "file": "assets/index.es-BeoX2IIG.js",
+    "file": "assets/index.es-r0WeDbSW.js",
     "name": "index.es",
     "src": "node_modules/canvg/lib/index.es.js",
     "isDynamicEntry": true,

@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
+import { ScrollToTop } from '@/components/ScrollToTop';
 
 const queryClient = new QueryClient();
 
@@ -15,6 +16,7 @@ export default function Layout() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <TooltipProvider>
+          <ScrollToTop />
           <Toaster />
           <Sonner />
           <div className="flex min-h-screen w-full bg-background">

@@ -195,6 +195,9 @@ export function ContentSection({ sectionId, subsectionId }: ContentSectionProps)
           >
             {() => (
               <CodePlayground
+                // Remount per topic so the editor loads THIS subsection's code
+                // and clears prior output — useState(initialCode) only seeds on mount.
+                key={`${sectionId}-${subsectionId}`}
                 title="Try it yourself"
                 initialCode={subsection.playground!.code}
                 hint={subsection.playground!.hint}

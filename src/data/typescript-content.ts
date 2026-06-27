@@ -2655,7 +2655,32 @@ What this project teaches:
 - **Error handling** with the patterns from the Async section
 - Organizing types and services in a small codebase
 
-**Time:** ~2–3 hours. You'll need a free [OpenWeatherMap](https://openweathermap.org/api) API key.`,
+**Time:** ~2–3 hours. You'll need a free [OpenWeatherMap](https://openweathermap.org/api) API key.
+
+This is a **build-along**: every step below has a runnable "Try it yourself" checkpoint. Hit **Run** on each one to see that piece work before moving on — by the last step you'll have run the whole flow end-to-end. Run the first checkpoint now to see exactly what you're building toward.`,
+        playground: {
+          hint: "The end goal — a typed Weather object turned into a display line. Run it.",
+          code: `// The shape of data your app will display
+type Weather = {
+  city: string;
+  temp: number;
+  description: string;
+  humidity: number;
+};
+
+function formatWeather(w: Weather): string {
+  return \`\${w.city}: \${w.temp}°C, \${w.description} (humidity \${w.humidity}%)\`;
+}
+
+const sample: Weather = {
+  city: "London",
+  temp: 18,
+  description: "light rain",
+  humidity: 72,
+};
+
+console.log(formatWeather(sample));`,
+        },
       },
       {
         id: "project-setup",
@@ -2664,7 +2689,9 @@ What this project teaches:
           "Set up a TypeScript project for the weather app: initialize npm, install TypeScript, Zod, and configure tsconfig.json with strict mode.",
         keywords:
           "typescript project setup, npm init, install zod, tsconfig strict, ts-node",
-        content: `Create the project and install dependencies. We use **Zod** for runtime validation and **tsx** to run TypeScript directly during development.`,
+        content: `Create the project and install dependencies. We use **Zod** for runtime validation and **tsx** to run TypeScript directly during development.
+
+Notice \`"strict": true\` in the config below — that's the setting that makes TypeScript pull its weight. Run the checkpoint to see how strictness forces you to handle the "no API key" case up front instead of crashing later.`,
         codeExamples: [
           {
             title: "Create the project",
@@ -2693,6 +2720,22 @@ npx tsc --init`,
             language: "json",
           },
         ],
+        playground: {
+          hint: "Strict mode in action: the API key might be undefined, so you must handle it.",
+          code: `// process.env.API_KEY is typed string | undefined.
+// Under "strict", you can't use it as a string until you've checked it.
+function requireApiKey(key: string | undefined): string {
+  if (!key) {
+    throw new Error("Set API_KEY in your environment first");
+  }
+  return key; // narrowed to string here
+}
+
+console.log("Using key:", requireApiKey("demo-key-123"));
+
+// Try it: pass undefined instead and re-run to see it throw early.
+// console.log(requireApiKey(undefined));`,
+        },
       },
       {
         id: "project-types",
@@ -2703,7 +2746,9 @@ npx tsc --init`,
           "zod schema, z.infer, runtime validation typescript, api types, schema validation",
         content: `Here's the key idea: define a **Zod schema** once, then **infer** the TypeScript type from it with \`z.infer\`. You get runtime validation *and* a static type from a single source of truth — if the API shape changes, you update one place.
 
-When the response arrives, \`schema.parse(data)\` checks it at runtime and returns a fully-typed, trusted value (or throws if the data is malformed).`,
+When the response arrives, \`schema.parse(data)\` checks it at runtime and returns a fully-typed, trusted value (or throws if the data is malformed).
+
+The checkpoint below is a hand-rolled version of what \`parse\` does, so you can see the idea run with no dependencies. Run it, then change \`temp\` to a string (\`"18"\`) and re-run — watch it reject the bad data.`,
         codeExamples: [
           {
             title: "src/types.ts",
@@ -2728,6 +2773,27 @@ export type Weather = z.infer<typeof WeatherSchema>;`,
             language: "typescript",
           },
         ],
+        playground: {
+          hint: "Zod does this for you — here's the same validate-or-throw idea by hand (no network).",
+          code: `type Weather = { city: string; temp: number };
+
+// A hand-rolled version of what Zod's schema.parse() does:
+function parseWeather(data: unknown): Weather {
+  if (
+    typeof data === "object" && data !== null &&
+    "city" in data && typeof (data as any).city === "string" &&
+    "temp" in data && typeof (data as any).temp === "number"
+  ) {
+    return data as Weather; // validated — safe to trust
+  }
+  throw new Error("Invalid weather data");
+}
+
+const ok = parseWeather({ city: "London", temp: 18 });
+console.log("Valid:", ok);
+
+// Try it: change temp to "18" (a string) and re-run — it throws.`,
+        },
       },
       {
         id: "project-service",
@@ -2738,7 +2804,9 @@ export type Weather = z.infer<typeof WeatherSchema>;`,
           "typescript fetch api, zod parse, async service, type-safe fetch, error handling",
         content: `Finally, the service that ties it together: fetch the data, validate it with the schema, and return a typed \`Weather\`. Because we \`parse\` the response, everything downstream is guaranteed to match our type — no \`any\`, no surprises.
 
-Notice how the concepts compound: async typing, a generic schema, runtime validation, and error handling all in a dozen lines. That's idiomatic, production-style TypeScript.`,
+Notice how the concepts compound: async typing, a generic schema, runtime validation, and error handling all in a dozen lines. That's idiomatic, production-style TypeScript.
+
+The capstone checkpoint below runs the **whole flow** end-to-end — fetch → validate → display — using a mocked response so it works with no API key or network. Run it to see your app produce its final output.`,
         codeExamples: [
           {
             title: "src/weatherService.ts",
@@ -2777,23 +2845,35 @@ main();`,
           },
         ],
         playground: {
-          hint: "A mini version of the validate-then-use pattern (no network).",
-          code: `type Weather = { city: string; temp: number };
+          hint: "The whole flow end-to-end with a mocked response — fetch → validate → display.",
+          code: `type Weather = { city: string; temp: number; description: string };
 
-function validate(data: unknown): Weather {
-  if (
-    typeof data === "object" && data !== null &&
-    "city" in data && "temp" in data &&
-    typeof (data as any).city === "string" &&
-    typeof (data as any).temp === "number"
-  ) {
-    return data as Weather;
-  }
-  throw new Error("Invalid weather data");
+// Pretend this is the JSON the OpenWeatherMap API sends back:
+function mockFetchWeather(city: string): unknown {
+  return {
+    name: city,
+    main: { temp: 18 },
+    weather: [{ description: "light rain" }],
+  };
 }
 
-const w = validate({ city: "London", temp: 18 });
-console.log(\`\${w.city}: \${w.temp}°C\`);`,
+// Validate the unknown response into a trusted Weather (Zod does this for real):
+function parseWeather(raw: any): Weather {
+  return {
+    city: raw.name,
+    temp: raw.main.temp,
+    description: raw.weather[0].description,
+  };
+}
+
+function formatWeather(w: Weather): string {
+  return \`\${w.city}: \${w.temp}°C, \${w.description}\`;
+}
+
+// The full pipeline:
+const raw = mockFetchWeather("London");
+const weather = parseWeather(raw);
+console.log(formatWeather(weather));`,
         },
       },
     ],

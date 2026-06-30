@@ -8,7 +8,7 @@ export default function Home() {
     <>
       <Seo
         title="TypeScript Hub — Learn TypeScript Free, From Zero to Advanced"
-        description="Learn TypeScript free with a hands-on, interactive course: types, functions, interfaces, generics, utility types, narrowing, React, and modern TypeScript (TS 6 & 7). Read, run code in the browser, and take quizzes."
+        description="Learn TypeScript free: a hands-on course on types, generics, utility types, narrowing, and React. Read, run code in the browser, and take quizzes."
         path=""
         keywords="learn typescript, typescript tutorial, typescript course, typescript for beginners, typescript examples, typescript online"
         jsonLd={courseJsonLd(sections)}

@@ -13,9 +13,13 @@ export function Header() {
       </div>
 
       <div className="hidden lg:block">
-        <h1 className="text-lg font-medium text-foreground">
+        {/* Site-wide brand label, NOT a page heading. Each page provides its own
+            single <h1> in its content (hero on home, topic title on learn pages).
+            Keeping this an <h1> created a hidden (mobile) duplicate h1 that made
+            Bing report the page's primary h1 as missing. */}
+        <p className="text-lg font-medium text-foreground">
           Learn TypeScript
-        </h1>
+        </p>
       </div>
 
       <div className="flex items-center gap-2">
